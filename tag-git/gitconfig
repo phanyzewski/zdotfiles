@@ -1,7 +1,7 @@
 [user]
   # Try per-repo .gitconfig instead
-  name = Gabe Berke-Williams
-  email = gabebw@gabebw.com
+  name = Paul Hanyzewski
+  email = hanyzewski@gmail.com
 [core]
   editor = vim
   whitespace = trailing-space,cr-at-eol
@@ -30,10 +30,15 @@
   # terminal. `i/tag-git/gitconfig` won't resolve, but `tag-git/gitconfig` will.
   noprefix = true
 [alias]
-  ls = !git log -S "$(pbpaste)"
+  l = log --pretty=oneline -n 20 --graph --abbrev-commit
+  ls = log --stat
+  s = status -s
   st = status --short --branch
-  co = checkout
-  cm = commit -av
+  pushf = push --force-with-lease --set-upstream
+  amend = commit --amend --reuse-message=HEAD
+  dc = diff --cached
+  # co = checkout
+  # cm = commit -av
   # Full commit messages without all the junk from `log --pretty=full`
   full = log -1 --pretty='%C(red)%H%nAuthor: %C(green)%an%n%C(magenta)%s%n%b'
   # No color, short messages
@@ -41,31 +46,31 @@
   # My default `git log` format without color
   nocolor = log --pretty='%h%d %s [%an, %cr]'
   unstage = reset HEAD
-  mm = master-to-main-wrapper merge-to %BRANCH%
+  # mm = master-to-main-wrapper merge-to %BRANCH%
   up = !git fetch origin && git master-to-main-wrapper rebase origin/%BRANCH%
-  mup = !git fetch origin && git master-to-main-wrapper merge --ff origin/%BRANCH%
+  # mup = !git fetch origin && git master-to-main-wrapper merge --ff origin/%BRANCH%
   r = master-to-main-wrapper rebase -i origin/%BRANCH%
   cp = cherry-pick
   # "cherry-pick previous", e.g. the head of the branch we just left
-  cpp = cherry-pick HEAD@{1}
-  newauthor = commit --amend --reset-author -C HEAD
+  # cpp = cherry-pick HEAD@{1}
+  # newauthor = commit --amend --reset-author -C HEAD
   next = !git add . && git rebase --continue
-  pr = !git push -u && git create-pull-request
+  # pr = !git push -u && git create-pull-request
   prf = !git pf -u && git create-pull-request
   # The advantage of --force-with-lease over --force is that it won't push if
   # you haven't already seen the ref you're overwriting. It avoids the race
   # condition of accidentally "push -f"ing over a commit you haven't seen.
   pf = push --force-with-lease --set-upstream
-  g = grep --extended-regexp --break --heading --line-number --show-function
-  ss = !git shalector | xargs git show
-  safe = !mkdir .git/safe
-  compare = hub compare
+  # g = grep --extended-regexp --break --heading --line-number --show-function
+  # ss = !git shalector | xargs git show
+  # safe = !mkdir .git/safe
+  # compare = hub compare
   current-branch = branch --show-current
   # Delete merged branches
   cleanup-merged = !git branch --merged | rg -v '^\\*| master' | xargs git branch -d
 
   # Check out a pull request by number: g co-pr 123
-  co-pr = !sh -c 'git fetch origin pull/$1/head:pr/$1 && git checkout pr/$1' -
+  # co-pr = !sh -c 'git fetch origin pull/$1/head:pr/$1 && git checkout pr/$1' -
 
   # Typos
   pul = pull
@@ -78,12 +83,12 @@
   authorsfile = ~/.git-author
 
 # insteadOf lets you do `git clone tb:dotfiles`
-[url "git@github.com:thoughtbot/"]
-  # thoughtbot, with write access
-  insteadOf = tb:
-[url "git@github.com:gabebw/"]
+[url "git@github.com:teamsnap/"]
+  # teamsnap, with write access
+  insteadOf = ts:
+[url "git@github.com:phanyzewski/"]
   # moi, with write access
-  insteadOf = gbw:
+  insteadOf = plh:
 [push]
   # Push current branch (and ONLY current branch) even if you've never pushed it
   # before.
@@ -137,7 +142,7 @@
   templatedir = ~/.git-template
   defaultBranch = main
 [github]
-  user = gabebw
+  user = phanyzewski
 [rebase]
   autosquash = true
   # Automatically stash before rebasing. This makes it possible to rebase with
