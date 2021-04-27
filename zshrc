@@ -69,7 +69,7 @@ curl-with-javascript(){
 alias dup="pushd dotfiles && git checkout main &>/dev/null && git pull && git checkout - &>/dev/null && popd && qq"
 alias ...="cd ../.."
 # Copy-pasting `$ python something.py` works
-alias \$=''
+# alias \$=''
 alias diff="command diff --color=auto -u"
 alias mkdir="command mkdir -p"
 alias serialnumber="ioreg -l | rg IOPlatformSerialNumber | cut -d= -f2 | sed 's/[ \"]//g' | tee /dev/tty | pbcopy; echo '(Copied for you)'"
@@ -298,7 +298,6 @@ export FZF_DEFAULT_OPTS='--color fg:188,bg:233,hl:103,fg+:222,bg+:234,hl+:104
 fpath=(
   ~/.zsh/completion-scripts
   /usr/local/share/zsh/site-functions
-  /usr/local/opt/heroku/libexec/node_modules/@heroku-cli/plugin-autocomplete/autocomplete/zsh
   $fpath
 )
 autoload -Uz compinit
@@ -344,8 +343,8 @@ zstyle ':completion:*:ls:*:*' list-colors 'di=34:ln=35:so=32:pi=33:ex=31:bd=34;4
 compdef '_files -/' tcd
 compdef viw=which
 compdef find-location-of=which
-compdef staging=heroku
-compdef production=heroku
+# compdef staging=heroku
+# compdef production=heroku
 
 if [ -f /usr/local/etc/bash_completion.d/um-completion.sh ]; then
   autoload -Uz bashcompinit && bashcompinit
@@ -370,7 +369,7 @@ bindkey "^I" expand-or-complete-with-dots
 PATH=/usr/local/bin:/usr/local/sbin:$PATH
 
 # Heroku standalone client
-PATH="/usr/local/heroku/bin:$PATH"
+# PATH="/usr/local/heroku/bin:$PATH"
 
 # Node
 PATH=$PATH:.git/safe/../../node_modules/.bin/
@@ -382,7 +381,7 @@ PATH=/usr/local/opt/python/libexec/bin:$PATH
 PATH=/usr/local/Cellar/python/3.7.2_2/Frameworks/Python.framework/Versions/3.7/bin:$PATH
 
 # Postgres.app
-PATH=$PATH:/Applications/Postgres.app/Contents/Versions/latest/bin
+# PATH=$PATH:/Applications/Postgres.app/Contents/Versions/latest/bin
 
 PATH=$HOME/.bin:$PATH
 PATH=./bin/stubs:$PATH
@@ -486,13 +485,13 @@ function g {
   fi
 }
 
-alias gd="git diff"
-alias gdm="git master-to-main-wrapper diff origin/%BRANCH%"
-alias amend="git commit --amend -Chead"
-alias amend-new="git commit --amend"
+# alias gd="git diff"
+# alias gdm="git master-to-main-wrapper diff origin/%BRANCH%"
+# alias amend="git commit --amend -Chead"
+# alias amend-new="git commit --amend"
 
-alias ga="git add"
-alias gcp="git rev-parse HEAD | xargs echo -n | pbcopy"
+# alias ga="git add"
+# alias gcp="git rev-parse HEAD | xargs echo -n | pbcopy"
 gcr(){
   local branch=$(select-git-branch --all)
   if [[ -n "$branch" ]]; then
@@ -576,68 +575,68 @@ split-on-spaces(){ tr ' ' '\n' }
 # Sum numbers (1 per line) from STDIN
 sum(){ join-with "+" | bc }
 
-function gcl {
-  # if you do `local directory=$(superclone "$@")`, it will not pick up the
-  # `superclone` return code and $? will always be 0 because it successfully
-  # assigned the variable. The solution is to separate `local` onto its own
-  # line.
-  local directory
-  directory=$(superclone "$@")
-  if [[ $? -eq 0 ]]; then
-    cd "$directory"
-  else
-    return 1
-  fi
-}
+# function gcl {
+#   # if you do `local directory=$(superclone "$@")`, it will not pick up the
+#   # `superclone` return code and $? will always be 0 because it successfully
+#   # assigned the variable. The solution is to separate `local` onto its own
+#   # line.
+#   local directory
+#   directory=$(superclone "$@")
+#   if [[ $? -eq 0 ]]; then
+#     cd "$directory"
+#   else
+#     return 1
+#   fi
+# }
 
-new-project(){
-  if [[ $# == 0 ]]; then
-    printf "Project name? "
-    read project_name
-  else
-    project_name=$1
-  fi
-  local project_name=${project_name// /-}
-  pushd personal >/dev/null
-  if [[ -d "$project_name" ]]; then
-    echo "!! Project directory with that name already exists" >&2
-    return 1
-  fi
-  if [[ -f "$project_name" ]]; then
-    echo "!! Project FILE with that name already exists" >&2
-    return 1
-  fi
-  mkdir "$project_name" && tcd "./$project_name"
-  popd >/dev/null
-}
+# new-project(){
+#   if [[ $# == 0 ]]; then
+#     printf "Project name? "
+#     read project_name
+#   else
+#     project_name=$1
+#   fi
+#   local project_name=${project_name// /-}
+#   pushd personal >/dev/null
+#   if [[ -d "$project_name" ]]; then
+#     echo "!! Project directory with that name already exists" >&2
+#     return 1
+#   fi
+#   if [[ -f "$project_name" ]]; then
+#     echo "!! Project FILE with that name already exists" >&2
+#     return 1
+#   fi
+#   mkdir "$project_name" && tcd "./$project_name"
+#   popd >/dev/null
+# }
 
 # Clone and start a new tmux session about it
-clone(){
-  if [[ $# < 2 ]]; then
-    echo "Please provide a directory and a repo name" >&2
-    echo "Usage: clone personal gabebw/dotfiles [gabebw-dotfiles]" >&2
-    return 1
-  fi
-  local directory=$1
-  local session_name
-  pushd "$directory" >/dev/null
-  shift
-  if gcl "$@"; then
-    # Name the session after the current directory
-    session_name=$(basename "$PWD")
-    if tmux-session-exists "$session_name"; then
-      session_name="${session_name}-new"
-    fi
-    tcd "$PWD" "$session_name"
-    popd >/dev/null
-  fi
-  popd >/dev/null
-}
+# clone(){
+#   if [[ $# < 2 ]]; then
+#     echo "Please provide a directory and a repo name" >&2
+#     echo "Usage: clone personal gabebw/dotfiles [gabebw-dotfiles]" >&2
+#     return 1
+#   fi
+#   local directory=$1
+#   local session_name
+#   pushd "$directory" >/dev/null
+#   shift
+#   if gcl "$@"; then
+#     # Name the session after the current directory
+#     session_name=$(basename "$PWD")
+#     if tmux-session-exists "$session_name"; then
+#       session_name="${session_name}-new"
+#     fi
+#     tcd "$PWD" "$session_name"
+#     popd >/dev/null
+#   fi
+#   popd >/dev/null
+# }
 
 # Complete `g` like `git`, etc
 compdef g=git
-compdef _git gc=git-branch
-compdef _git ga=git-add
+# compdef _git gc=git-branch
+# compdef _git ga=git-add
 # }}}
 
 # Editor {{{
@@ -671,13 +670,13 @@ alias crontab="VISUAL=vim crontab"
 
 # Ruby/Rails {{{
 
-alias h=heroku
-alias migrate="be rake db:migrate db:test:prepare"
-alias rollback="be rake db:rollback"
-alias remigrate="migrate && rake db:rollback && migrate"
-alias rrg="be rake routes | rg"
-alias db-reset="be rake db:drop db:create db:migrate db:test:prepare"
-alias unfuck-gemfile="git checkout HEAD -- Gemfile.lock"
+# alias h=heroku
+# alias migrate="be rake db:migrate db:test:prepare"
+# alias rollback="be rake db:rollback"
+# alias remigrate="migrate && rake db:rollback && migrate"
+# alias rrg="be rake routes | rg"
+# alias db-reset="be rake db:drop db:create db:migrate db:test:prepare"
+# alias unfuck-gemfile="git checkout HEAD -- Gemfile.lock"
 
 # Bundler
 alias be="bundle exec"
@@ -719,37 +718,37 @@ cra(){
 
 # Postgres {{{
 # Set filetype on editing. Use `\e` to open the editor from `psql`.
-export PSQL_EDITOR="vim -c ':set ft=sql'"
+# export PSQL_EDITOR="vim -c ':set ft=sql'"
 
-# db-dump DB_NAME FILENAME
-function db-dump() {
-  if (( $# == 2 )); then
-    pg_dump --clean --create --format=custom --file "$2" "$1" && \
-      echo "Wrote to $2"
-  else
-    echo "Usage: db-dump DB_NAME FILENAME"
-    return 1
-  fi
-}
+# # db-dump DB_NAME FILENAME
+# function db-dump() {
+#   if (( $# == 2 )); then
+#     pg_dump --clean --create --format=custom --file "$2" "$1" && \
+#       echo "Wrote to $2"
+#   else
+#     echo "Usage: db-dump DB_NAME FILENAME"
+#     return 1
+#   fi
+# }
 
 # db-restore DB_NAME FILENAME
-function db-restore() {
-  if (( $# == 2 )); then
-    dropdb "$1" && \
-      createdb "$1" && \
-      pg_restore \
-        --verbose \
-        --clean \
-        --no-acl \
-        --no-owner \
-        --jobs $(getconf _NPROCESSORS_ONLN) \
-        --dbname "$1" \
-        "$2"
-  else
-    echo "Usage: db-restore DB_NAME FILENAME"
-    return 1
-  fi
-}
+# function db-restore() {
+#   if (( $# == 2 )); then
+#     dropdb "$1" && \
+#       createdb "$1" && \
+#       pg_restore \
+#         --verbose \
+#         --clean \
+#         --no-acl \
+#         --no-owner \
+#         --jobs $(getconf _NPROCESSORS_ONLN) \
+#         --dbname "$1" \
+#         "$2"
+#   else
+#     echo "Usage: db-restore DB_NAME FILENAME"
+#     return 1
+#   fi
+# }
 # }}}
 
 # Homebrew {{{
@@ -766,30 +765,31 @@ export HOMEBREW_INSTALL_CLEANUP=1
 # }}}
 
 # custom TIL script, with completion {{{
-TIL_DIRECTORY="/Users/gabe/code/personal/today-i-learned/"
-_complete-first-file-argument() {
-  if (( CURRENT == 2 )); then
-    # Only complete first argument
-    _files -W "$TIL_DIRECTORY"
-  fi
-}
-til(){
-  if [[ $# == 0 ]]; then
-    echo "Usage: til how to do something"
-    return 0;
-  fi
-  local filename=$*
-  filename=${filename// /-}
-  mkdir -p "$(basename "${TIL_DIRECTORY}/${filename}")"
-  echo "# $*\n" > "${TIL_DIRECTORY}/${filename}.md"
-  vim "${TIL_DIRECTORY}/${filename}.md"
-  echo "Don't forget to commit your file!"
-}
-compdef _complete-first-file-argument til
+# TIL_DIRECTORY="/Users/gabe/code/personal/today-i-learned/"
+# _complete-first-file-argument() {
+#   if (( CURRENT == 2 )); then
+#     # Only complete first argument
+#     _files -W "$TIL_DIRECTORY"
+#   fi
+# }
+# til(){
+#   if [[ $# == 0 ]]; then
+#     echo "Usage: til how to do something"
+#     return 0;
+#   fi
+#   local filename=$*
+#   filename=${filename// /-}
+#   mkdir -p "$(basename "${TIL_DIRECTORY}/${filename}")"
+#   echo "# $*\n" > "${TIL_DIRECTORY}/${filename}.md"
+#   vim "${TIL_DIRECTORY}/${filename}.md"
+#   echo "Don't forget to commit your file!"
+# }
+# compdef _complete-first-file-argument til
 # }}}
 
 # Set up SSH helper (mostly for Git)
 ssh-add -K ~/.ssh/id_rsa 2> /dev/null
+ssh-add -K ~/.ssh/gh_id_ed25519 2> /dev/null
 
 # zsh-syntax-highlighting must be sourced after all custom widgets have been
 # created (i.e., after all zle -N calls and after running compinit), because it
