@@ -64,7 +64,7 @@ brew "rbenv"
 brew "rbenv-default-gems"
 
 # Volta version manager for Node
-brew "volta"
+# brew "volta"
 
 # Simple graphs with `bin/line_graph`
 brew "gnuplot"

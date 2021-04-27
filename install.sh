@@ -40,12 +40,6 @@ command_does_not_exist(){
   ! command -v "$1" > /dev/null
 }
 
-make_qlstephen_work_on_catalina(){
-  xattr -cr ~/Library/QuickLook/QLStephen.qlgenerator
-  qlmanage -r
-  qlmanage -r cache
-  killall Finder
-}
 
 info "Checking for command-line tools..."
 if command_does_not_exist xcodebuild; then
@@ -82,9 +76,7 @@ fi
 # Brewfile.casks exits 1 sometimes but didn't actually fail
 quietly_brew_bundle Brewfile.casks || true
 # Pin postgresql since I use Postgres.app and we only need it as a dependency
-brew pin postgresql
-
-make_qlstephen_work_on_catalina
+# brew pin postgresql
 
 info "Installing rust..."
 stay_awake_while rustup-init -y > /dev/null
@@ -94,12 +86,12 @@ rustup component add clippy
 
 info "Installing lister..."
 if command_does_not_exist lister; then
-  stay_awake_while cargo install --git https://github.com/gabebw/rust-lister
+  stay_awake_while cargo install --git https://github.com/gabebw/rust-lister --branch main
 fi
 
 info "Installing Firefox open URL printer..."
 if command_does_not_exist firefox-all-open-urls; then
-  stay_awake_while cargo install --git https://github.com/gabebw/rust-firefox-all-open-urls
+  stay_awake_while cargo install --git https://github.com/gabebw/rust-firefox-all-open-urls --branch main
 fi
 
 if ! echo "$SHELL" | grep -Fq zsh; then

@@ -394,8 +394,6 @@ alias ci="cargo install --path . --force"
 eval "$(rbenv init -)"
 
 # Volta
-export VOLTA_HOME="$HOME/.volta"
-PATH="$VOLTA_HOME/bin:$PATH"
 # }}}
 
 # Key bindings {{{
@@ -795,12 +793,16 @@ ssh-add -K ~/.ssh/gh_id_ed25519 2> /dev/null
 # created (i.e., after all zle -N calls and after running compinit), because it
 # has to know about them to highlight them.
 # More on ZSH_HIGHLIGHT_HIGHLIGHTERS:
+# export ZSH_HIGHLIGHT_HIGHLIGHTERS_DIR=/opt/homebrew/share/zsh-syntax-highlighting/highlighters
+
 # https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/docs/highlighters.md
 if [[  -z "$ZSH_HIGHLIGHT_HIGHLIGHTERS" ]]; then
   # Only source Zsh Syntax Highlighting once, otherwise we can run into
   # a "maximum nested function level reached" error
   ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets)
-  source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+  # source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fi
 
 [[ -r ~/.aliases ]] && source ~/.aliases
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME/bin:$PATH"
