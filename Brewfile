@@ -1,21 +1,21 @@
 # vim: syntax=ruby filetype=ruby
 
-tap "thoughtbot/formulae"
+# tap "thoughtbot/formulae"
 # rcm: dotfile management
 brew "rcm"
 # parity: useful tools for Heroku development/staging/production
-brew "parity"
+# brew "parity"
 
 # Lets us do `brew services restart postgres`, etc
-tap "homebrew/services"
+# tap "homebrew/services"
 
 # https://unused.codes/
 tap "unused-code/formulae"
 brew "unused"
 
-tap "gabebw/formulae"
+# tap "gabebw/formulae"
 # sed for HTML: https://github.com/gabebw/candle
-brew "candle"
+# brew "candle"
 
 # Includes an updated CA bundle.
 # Crucial for my Pinboard integration, even if it's not `brew link`ed in.
@@ -26,10 +26,10 @@ brew "chrome-cli"
 brew "fd"
 brew "fzf"
 brew "git"
-brew "heroku"
+# brew "heroku"
 brew "hexyl"
 brew "hub"
-brew "pgrep"
+# brew "pgrep"
 brew "ripgrep"
 brew "tag"
 brew "tree"
@@ -85,3 +85,14 @@ brew "starship"
 
 # Git Large File Support
 brew "git-lfs"
+
+brew "screen"
+brew "htop"
+brew "elixir"
+brew "node"
+brew "imagemagick"
+brew "go"
+brew "ruby"
+brew "ruby-install"
+brew "tmux"
+brew "wget"

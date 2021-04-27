@@ -2,29 +2,20 @@
 # These are in a separate file so that install.sh can let installing these casks
 # "fail" when the apps are actually already installed.
 
-tap "homebrew/cask-fonts"
-cask "font-iosevka"
-cask "font-inconsolata"
+cask "iterm2"
 
-cask "1password"
-cask "alacritty"
-cask "alfred"
-cask "anki"
 cask "appcleaner"
-cask "bartender"
-cask "beardedspice"
-cask "chatology"
-cask "choosy"
-cask "coconutbattery"
-cask "dash"
+cask "dash" # api documentation
 cask "dropbox"
 cask "google-chrome"
-cask "muzzle"
-cask "netnewswire"
+cask "muzzle" # silences notifications
 cask "ngrok"
-cask "postgres" # Postgres.app
 cask "qlstephen" # quicklook plain text files
 cask "spotify"
 cask "vlc"
-cask "xee"
+cask "xee" # image viwer
 cask "zoomus"
+
+cask "rectangle"
+cask "visual-studio-code'
+cask "sublime-text"
