@@ -54,7 +54,7 @@ fi
 
 info "Installing Homebrew (if not already installed)..."
 if command_does_not_exist brew; then
-  stay_awake_while /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  stay_awake_while /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
 info "Installing Homebrew packages..."
@@ -65,7 +65,7 @@ for brewfile in Brewfile */Brewfile; do
 done
 
 app_store_id=$(mas account || true)
-desired_app_store_id="gabebw@gabebw.com"
+desired_app_store_id="hanyzewski@gmail.com"
 if [[ "$app_store_id" == "$desired_app_store_id" ]]; then
   quietly_brew_bundle Brewfile.mas
 else
