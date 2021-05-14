@@ -385,6 +385,7 @@ PATH=/usr/local/Cellar/python/3.7.2_2/Frameworks/Python.framework/Versions/3.7/b
 
 PATH=$HOME/.bin:$PATH
 PATH=./bin/stubs:$PATH
+PATH="$(go env GOPATH)/bin":$PATH
 
 # Rust
 [[ -r "$HOME"/.cargo/env ]] && source "$HOME"/.cargo/env
@@ -806,3 +807,21 @@ fi
 [[ -r ~/.aliases ]] && source ~/.aliases
 export VOLTA_HOME="$HOME/.volta"
 export PATH="$VOLTA_HOME/bin:$PATH"
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/paulhanyzewski/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/paulhanyzewski/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/paulhanyzewski/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/paulhanyzewski/google-cloud-sdk/completion.zsh.inc'; fi
+
+# SSH to a specific Google Cloud Instance
+gssh () {
+  gcloud compute ssh --internal-ip --zone "$(gcloud compute instances list --format="value(ZONE)" --filter="name=$1")" $1
+}
+# SSH to the first server that matches the name
+tssh () {
+  compute_instance_info=$(gcloud compute instances list --format="value(NAME,ZONE)" --filter="name:$1" | head -n 1)
+  compute_instance_name="$(echo -n $compute_instance_info | awk '{print $1}')"
+  compute_instance_zone="$(echo -n $compute_instance_info | awk '{print $2}')"
+  gcloud compute ssh --internal-ip --zone "$compute_instance_zone" "$compute_instance_name"
+}
