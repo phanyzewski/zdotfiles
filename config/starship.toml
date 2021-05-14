@@ -2,17 +2,28 @@
 # https://i.stack.imgur.com/KTSQa.png
 
 # Don't print a new line at the start of the prompt
-add_newline = false
+add_newline = true
 
 format = """
-$time\
-$ruby\
-${custom.nodejs}\
+$username\
+$hostname\
+$shlvl\
+$kubernetes\
 $directory\
 $git_branch\
+$git_commit\
 $git_state\
 $git_status\
-\\$ """
+$golang\
+$helm\
+$terraform\
+$memory_usage\
+$gcloud\
+$cmd_duration\
+$line_break\
+$time\
+$status\
+$character"""
 
 [time]
 disabled = false
@@ -20,54 +31,13 @@ format = "[$time]($style) "
 style = "#888888"
 use_12hr = true
 
-[ruby]
-format = "[($version )]($style)"
-style = "fg:218" # pink
+[gcloud]
+format = '[$symbol (\($project\))](dimmed green) '
 
-[directory]
-# Show 1 parent directory (setting to 0 means no truncation)
-truncation_length = 2
-# A lovely grayish-purple
-style = "fg:146"
-format = "[$path]($style) "
-# When in a Git repo, keep showing parent directories
-truncate_to_repo = false
+[kubernetes]
+format = 'on [☸ $context \($namespace\)](fg:031) '
+disabled = false
 
-[git_branch]
-format = "[($branch )]($style)"
-style = "fg:031" # dark blue
-
-[git_state]
-cherry_pick = "[🍒 PICKING](bold fg:197)" # red
-
-[git_status]
-format = """
-($conflicted\
-$stashed\
-$deleted\
-$renamed\
-$modified\
-$staged\
-$untracked )\
-($ahead_behind )""" # purple
-stashed = "[stash](bold fg:222)" # yellow
-staged = "[S](bold fg:222)" # yellow
-conflicted = "[=](bold fg:197)" # red
-untracked = "[?](bold fg:159)" # cyan
-modified = "[!](bold fg:222)" # yellow
-deleted = "[✘](bold fg:197)" # red
-behind = "[↓](bold fg:159)" # cyan
-ahead = "[↑](bold fg:159)" # cyan
-diverged = "[⇔](bold fg:197)" # red
-
-[custom.nodejs]
-description = "Custom NodeJS"
-# Using Volta (with post-processing) is slower than just doing `node --version`
-command = "node --version"
-files = ["package.json", ".node-version", "yarn.lock"]
-directories = ["node_modules"]
-# Unlike the standard nodejs module, it intentionally does not check for
-# *.js or *.ts since that triggers too often
-extensions = []
-format = "[($output )]($style)"
-style = "fg:031" # dark blue
+[kubernetes.context_aliases]
+"gke_production-195315_us-east1_prod-us-east1-summer-1" = "prod-us-east1-summer-1"
+"gke_staging-205121_us-east1_staging-us-east1-spring-1" = "staging-us-east1-summer-1"
