@@ -738,7 +738,7 @@ runtime macros/matchit.vim
 " _after_ loading plugins.
 filetype plugin indent on
 syntax enable
-silent! colorscheme Tomorrow-Night-Bright
+silent! colorscheme solarized8_dark_flat
 
 function! SyntaxItem()
   " https://vim.fandom.com/wiki/Identify_the_syntax_highlighting_group_used_at_the_cursor
