@@ -132,7 +132,8 @@ fi
 # Load Volta and rbenv (before setup scripts) in case it's the first time installing them
 eval "$(rbenv init -)"
 export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME/bin:$PATH"
+export PATH=$PATH"$VOLTA_HOME/bin:"
+export PATH=$PATH"$(go env GOPATH)/bin:"
 
 info "Running all setup scripts..."
 for setup in tag-*/setup; do
