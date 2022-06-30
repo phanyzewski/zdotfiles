@@ -826,3 +826,36 @@ tssh () {
   gcloud compute ssh --internal-ip --zone "$compute_instance_zone" "$compute_instance_name"
 }
 export PATH="/opt/homebrew/opt/mysql-client/bin:$PATH"
+pocs () {
+  gcloud config configurations activate pocs && \
+  gcloud config configurations list && \
+  echo "" && \
+  echo "Kubernetes Clusters:" && \
+  gcloud container clusters list && \
+  gcloud container clusters get-credentials us-east1-autopilot-poc -z us-east1
+}
+staging () {
+  gcloud config configurations activate staging && \
+  gcloud config configurations list && \
+  echo "" && \
+  echo "Kubernetes Clusters:" && \
+  gcloud container clusters list && \
+  gcloud container clusters get-credentials staging-us-east1-spring-1 -z us-east1
+}
+prod () {
+  gcloud config configurations activate production && \
+  gcloud config configurations list && \
+  echo "" && \
+  echo "Kubernetes Clusters:" && \
+  gcloud container clusters list && \
+  gcloud container clusters get-credentials prod-us-east1-summer-1 -z us-east1
+}
+imup () {
+  gcloud config configurations activate imup && \
+  gcloud config configurations list && \
+  echo "" && \
+  echo "Kubernetes Clusters:" && \
+  gcloud container clusters list && \
+  gcloud container clusters get-credentials imup -z us-central1-a
+}
+export PATH="/opt/homebrew/opt/mongodb-community@4.4/bin:$PATH"

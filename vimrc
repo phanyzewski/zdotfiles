@@ -638,12 +638,14 @@ command! -nargs=1 Gbranch :Git checkout -b
 " ===========================================================================
 " vim-plug: https://github.com/junegunn/vim-plug
 call plug#begin('~/.vim/bundle')
+Plug 'NLKNguyen/papercolor-theme'
 
 " JavaScript
 Plug 'pangloss/vim-javascript'
 Plug 'MaxMEllon/vim-jsx-pretty'
 Plug 'leafgarland/typescript-vim'
 Plug 'peitalin/vim-jsx-typescript'
+Plug 'NLKNguyen/papercolor-theme'
 
 " Ruby/Rails
 Plug 'tpope/vim-rails'
@@ -738,7 +740,21 @@ runtime macros/matchit.vim
 " _after_ loading plugins.
 filetype plugin indent on
 syntax enable
-silent! colorscheme solarized8_dark_flat
+set background=dark
+silent! colorscheme papercolor
+
+" Returns true if the color hex value is light
+function! IsHexColorLight(color) abort
+  let l:raw_color = trim(a:color, '#')
+
+  let l:red = str2nr(substitute(l:raw_color, '(.{2}).{4}', '1', 'g'), 16)
+  let l:green = str2nr(substitute(l:raw_color, '.{2}(.{2}).{2}', '1', 'g'), 16)
+  let l:blue = str2nr(substitute(l:raw_color, '.{4}(.{2})', '1', 'g'), 16)
+
+  let l:brightness = ((l:red * 299) + (l:green * 587) + (l:blue * 114)) / 1000
+
+  return l:brightness > 155
+endfunction
 
 function! SyntaxItem()
   " https://vim.fandom.com/wiki/Identify_the_syntax_highlighting_group_used_at_the_cursor

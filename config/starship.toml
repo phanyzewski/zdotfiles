@@ -8,9 +8,11 @@ format = """
 $username\
 $hostname\
 $shlvl\
+$gcloud\
 $kubernetes\
 $directory\
 $git_branch\
+$git_metrics\
 $git_commit\
 $git_state\
 $git_status\
@@ -19,7 +21,6 @@ $elixir\
 $helm\
 $terraform\
 $memory_usage\
-$gcloud\
 $cmd_duration\
 $line_break\
 $time\
@@ -33,12 +34,31 @@ style = "#888888"
 use_12hr = true
 
 [gcloud]
-format = '[$symbol (\($project\))](dimmed green) '
+format = "[$symbol$project $domain on]($style) "
+style = "cyan"
+symbol = " "
 
 [kubernetes]
-format = 'on [☸ $context \($namespace\)](fg:031) '
+format = '[$symbol$context( \($namespace\))]($style) ➠ '
+style = "blue"
 disabled = false
 
 [kubernetes.context_aliases]
 "gke_production-195315_us-east1_prod-us-east1-summer-1" = "prod-us-east1-summer-1"
 "gke_staging-205121_us-east1_staging-us-east1-spring-1" = "staging-us-east1-summer-1"
+"gke_staging-205121_us-east1_staging-soar-us-east1" = "soar staging"
+
+[golang]
+symbol = " "
+style = "cyan"
+
+[ruby]
+symbol = " "
+style = "red"
+
+[git_branch]
+symbol = " "
+style = "white"
+
+[directory]
+style = "yellow"
