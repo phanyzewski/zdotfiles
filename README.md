@@ -43,3 +43,7 @@ sure I'm forgetting.
 [Chris Toomey]: https://github.com/christoomey/dotfiles
 [Gordon Fontenot]: https://github.com/gfontenot/dotfiles
 [Teo Ljungberg]: https://github.com/teoljungberg/dotfiles
+
+## Missing
+viscosity
+slack

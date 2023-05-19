@@ -34,10 +34,12 @@ fi
 # }}}
 
 # Aliases {{{
+mysql=/usr/local/opt/mysql-client/bin/mysql
 va(){ vim ~/.aliases }
 q(){ vim "$(readlink ~/.zshrc)" }
 alias qq="cd . && source ~/.zshrc"
 alias cp="cp -iv"
+alias gs="g s"
 alias rm="rm -iv"
 alias mv="mv -iv"
 alias ls="ls -FGh"
@@ -300,7 +302,7 @@ fpath=(
   /usr/local/share/zsh/site-functions
   $fpath
 )
-autoload -Uz compinit
+autoload -Uz compinit && compinit
 # completion: use cache if updated within 24h
 if [[ -n $HOME/.zcompdump(#qN.mh+24) ]]; then
   compinit -d $HOME/.zcompdump
@@ -346,10 +348,10 @@ compdef find-location-of=which
 # compdef staging=heroku
 # compdef production=heroku
 
-if [ -f /usr/local/etc/bash_completion.d/um-completion.sh ]; then
-  autoload -Uz bashcompinit && bashcompinit
-  . /usr/local/etc/bash_completion.d/um-completion.sh
-fi
+# if [ -f /usr/local/etc/bash_completion.d/um-completion.sh ]; then
+#   autoload -Uz bashcompinit && bashcompinit
+#   . /usr/local/etc/bash_completion.d/um-completion.sh
+# fi
 
 # Show dots when autocompleting, so that I know it's doing something when
 # autocompletion takes a long time.
@@ -476,14 +478,15 @@ eval "$(starship init zsh)"
 
 # By itself: run `git status`
 # With arguments: acts like `git`
-function g {
-  if [[ $# > 0 ]]; then
-    git "$@"
-  else
-    git st
-  fi
-}
+# function g {
+#   if [[ $# > 0 ]]; then
+#     git "$@"
+#   else
+#     git st
+#   fi
+# }
 
+alias g=git
 # alias gd="git diff"
 # alias gdm="git master-to-main-wrapper diff origin/%BRANCH%"
 # alias amend="git commit --amend -Chead"
@@ -808,12 +811,6 @@ fi
 export VOLTA_HOME="$HOME/.volta"
 export PATH="$VOLTA_HOME/bin:$PATH"
 
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/paulhanyzewski/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/paulhanyzewski/google-cloud-sdk/path.zsh.inc'; fi
-
-# The next line enables shell command completion for gcloud.
-if [ -f '/Users/paulhanyzewski/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/paulhanyzewski/google-cloud-sdk/completion.zsh.inc'; fi
-
 # SSH to a specific Google Cloud Instance
 gssh () {
   gcloud compute ssh --internal-ip --zone "$(gcloud compute instances list --format="value(ZONE)" --filter="name=$1")" $1
@@ -826,14 +823,12 @@ tssh () {
   gcloud compute ssh --internal-ip --zone "$compute_instance_zone" "$compute_instance_name"
 }
 export PATH="/opt/homebrew/opt/mysql-client/bin:$PATH"
-pocs () {
-  gcloud config configurations activate pocs && \
-  gcloud config configurations list && \
-  echo "" && \
-  echo "Kubernetes Clusters:" && \
-  gcloud container clusters list && \
-  gcloud container clusters get-credentials us-east1-autopilot-poc -z us-east1
-}
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/phanyzewski/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/phanyzewski/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/phanyzewski/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/phanyzewski/google-cloud-sdk/completion.zsh.inc'; fi
 staging () {
   gcloud config configurations activate staging && \
   gcloud config configurations list && \
@@ -842,20 +837,21 @@ staging () {
   gcloud container clusters list && \
   gcloud container clusters get-credentials staging-us-east1-spring-1 -z us-east1
 }
+
 prod () {
-  gcloud config configurations activate production && \
+  gcloud config configurations activate production
+  sdm k8s update-config prod-us-east1-summer-1 --force
+}
+
+tier1 () {
+  gcloud config configurations activate production
+  sdm k8s update-config prod-us-east1-tier-1 --force
+}
+
+pocs () {
+  gcloud config configurations activate poc && \
   gcloud config configurations list && \
   echo "" && \
   echo "Kubernetes Clusters:" && \
-  gcloud container clusters list && \
-  gcloud container clusters get-credentials prod-us-east1-summer-1 -z us-east1
+  gcloud container clusters list
 }
-imup () {
-  gcloud config configurations activate imup && \
-  gcloud config configurations list && \
-  echo "" && \
-  echo "Kubernetes Clusters:" && \
-  gcloud container clusters list && \
-  gcloud container clusters get-credentials imup -z us-central1-a
-}
-export PATH="/opt/homebrew/opt/mongodb-community@4.4/bin:$PATH"

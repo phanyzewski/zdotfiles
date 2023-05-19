@@ -1,4 +1,4 @@
 #!/bin/sh
 
 # for `cargo add`
-cargo install edit
+# cargo install edit
