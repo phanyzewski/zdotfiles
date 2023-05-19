@@ -855,3 +855,13 @@ pocs () {
   echo "Kubernetes Clusters:" && \
   gcloud container clusters list
 }
+imup () {
+  gcloud config configurations activate imup && \
+  gcloud config configurations list && \
+  echo "" && \
+  echo "Kubernetes Clusters:" && \
+  gcloud container clusters list && \
+  gcloud container clusters get-credentials imup -z us-central1-a
+}
+export CLOUDSDK_PYTHON="/opt/homebrew/bin/python3.8"
+export PATH="/opt/homebrew/opt/mongodb-community@4.4/bin:$PATH"

@@ -42,8 +42,25 @@ style = "blue"
 disabled = false
 
 [kubernetes.context_aliases]
-"gke_staging-205121_us-east1_staging-us-east1-spring-1" = "staging-summer"
-"gke_staging-205121_us-east1_staging-us-east1-cse" = "staging-cse"
-"gke_staging-205121_us-east1_staging-so-us-east1-spring-1" = "staging-so"
-"gke_production-195315_us-east1_prod-us-east1-summer-1" = "prod-summer"
 "gke_production-195315_us-east1_prod-us-east1-tier-1" = "prod-tier-1"
+"gke_production-195315_us-east1_prod-us-east1-summer-1" = "prod-summer"
+"gke_staging-205121_us-east1_staging-us-east1-cse" = "staging cse"
+"gke_staging-205121_us-east1_staging-soar-us-east1" = "staging soar"
+"gke_staging-205121_us-east1_staging-us-east1-brands" = "staging brands"
+"gke_staging-205121_us-east1_staging-so-us-east1-spring-1" = "staging so"
+"gke_staging-205121_us-east1_staging-us-east1-spring-1" = "staging summer"
+
+[golang]
+symbol = " "
+style = "cyan"
+
+[ruby]
+symbol = " "
+style = "red"
+
+[git_branch]
+symbol = " "
+style = "white"
+
+[directory]
+style = "yellow"
