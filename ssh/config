@@ -1,4 +1,39 @@
-Host i
-    HostName i.gabebw.com
-    Port 13425
-    User gabe
+Host github.com *.github.com
+    IdentityFile ~/.ssh/gh_id_ed25519
+    IdentitiesOnly yes
+
+Host gitlab.teamsnap.io
+    User git
+    IdentitiesOnly yes
+    IdentityFile ~/.ssh/gl_id
+
+# TeamSnap Google Cloud Configuration
+Host 172.27.* 172.28.*
+    User phanyzewski
+    ForwardAgent yes
+    VerifyHostKeyDNS no
+    StrictHostKeyChecking no
+    IdentityFile ~/.ssh/ts_id
+    UserKnownHostsFile=/dev/null
+    HashKnownHosts  no
+    TCPKeepAlive yes
+    ServerAliveInterval 300
+    ForwardX11 no
+    UseKeychain yes
+
+Host *teamsnap.io *.teamsnap.vpn *.teamsnap.com *.teamsnap.osi *.teamsnap.iad *.teamsnap.pcd 172.21.* 172.18.* 172.23.*
+    User phanyzewski
+    IdentitiesOnly yes
+    IdentityFile ~/.ssh/ts_id
+    VerifyHostKeyDNS no
+    UserKnownHostsFile=/dev/null
+    HashKnownHosts  no
+    ForwardAgent yes
+    StrictHostKeyChecking no
+    TCPKeepAlive yes
+    ServerAliveInterval 300
+    ForwardX11 no
+
+Host *
+  AddKeysToAgent yes
+  UseKeychain yes

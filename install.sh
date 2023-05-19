@@ -22,7 +22,7 @@ info(){
 }
 
 error(){
-  red "!! $@"
+  red "!! $@" >&2
 }
 
 stay_awake_while(){
@@ -48,7 +48,7 @@ fi
 
 info "Installing Homebrew (if not already installed)..."
 if command_does_not_exist brew; then
-  stay_awake_while /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  stay_awake_while /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 fi
 
 info "Installing Homebrew packages..."
@@ -86,12 +86,12 @@ rustup component add clippy
 
 info "Installing lister..."
 if command_does_not_exist lister; then
-  stay_awake_while cargo install --git https://github.com/gabebw/rust-lister --branch main
+  stay_awake_while cargo install --git https://github.com/gabebw/rust-lister
 fi
 
 info "Installing Firefox open URL printer..."
 if command_does_not_exist firefox-all-open-urls; then
-  stay_awake_while cargo install --git https://github.com/gabebw/rust-firefox-all-open-urls --branch main
+  stay_awake_while cargo install --git https://github.com/gabebw/rust-firefox-all-open-urls
 fi
 
 if ! echo "$SHELL" | grep -Fq zsh; then
@@ -132,11 +132,11 @@ fi
 # Load Volta and rbenv (before setup scripts) in case it's the first time installing them
 eval "$(rbenv init -)"
 export VOLTA_HOME="$HOME/.volta"
-export PATH=$PATH"$VOLTA_HOME/bin:"
-export PATH=$PATH"$(go env GOPATH)/bin:"
+export PATH="$VOLTA_HOME/bin:$PATH"
+export PATH="$(go env GOPATH)/bin:$PATH"
 
 info "Running all setup scripts..."
-for setup in tag-*/setup; do
+for setup in tag-*/setup vscode/setup; do
   dir=$(basename "$(dirname "$setup")")
   info "Running setup for ${dir#tag-}..."
   . "$setup"
@@ -145,18 +145,6 @@ done
 mkdir -p ~/code/work
 mkdir -p ~/code/personal
 mkdir -p ~/code/src
-
-# Install extensions
-# if command_does_not_exist code; then
-#   error "Open VS Code and run: Install code command in \$PATH"
-# else
-#   for extension in $(cat vscode/extensions); do
-#     code --install-extension "$extension"
-#   done
-# fi
-
-# Repeated keys in VSCode _won't_ pop up the accent/umlaut menu
-defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false
 
 green "== Success!"
 

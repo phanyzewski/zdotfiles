@@ -4,6 +4,11 @@
 " Disable Vi compatibility.
 set nocompatible
 
+" Ensure we use a more POSIX-compatible shell than Fish for Vim stuff like :%!
+if &shell =~# 'fish$'
+  set shell=zsh
+endif
+
 " Leader is <Space>. Set it early because leader is used at the moment mappings
 " are defined. Changing mapleader after a mapping is defined has no effect on
 " the mapping.
@@ -198,11 +203,11 @@ endfunction
 
 augroup Pasting
   autocmd!
-  autocmd VimEnter * nunmap cv
+  autocmd VimEnter * silent! nunmap cv
   autocmd VimEnter * nnoremap cv :call MyPaste()<CR>
 augroup END
 
-" edit vimrc/zshrc and load vimrc bindings
+" edit vimrc or shell config and load vimrc bindings
 function! MaybeTabedit(file)
   let real_file = resolve(a:file)
   let new_empty_file = line('$') == 1 && getline(1) == '' && bufname('%') == ''
@@ -230,7 +235,7 @@ xnoremap > >gv
 nnoremap Y "*yiw
 
 " ReRun last command
-nnoremap <Leader>rr :write\|VtrSendCommand! !-1 <CR>
+nnoremap <Leader>rr :write\|VtrSendCommand! eval $history[1]<CR>
 " }}}
 
 " ============================================================================
@@ -348,18 +353,6 @@ let g:gundo_prefer_python3 = 1
 " --------
 let g:peekaboo_window	= 'vert bo 50new'
 
-" Ale
-" --------
-
-" Ale is just used for fixing
-let g:ale_fixers = {}
-let g:ale_fixers.css = ['prettier']
-let g:ale_fixers.scss = ['prettier']
-let g:ale_fixers.ruby = ['standardrb']
-let g:ale_fixers.rust = ['rustfmt']
-let g:ale_fix_on_save = 1
-let g:ale_linters = {}
-
 " FZF
 " -----------------
 " This prefixes all FZF-provided commands with 'Fzf' so I can easily find cool
@@ -383,6 +376,7 @@ nnoremap <Leader>b :FzfBuffers<CR>
 " easytags
 " ----------
 let g:easytags_async = 1
+let g:easytags_cmd = '/usr/local/bin/ctags'
 
 " rails.vim
 "----------
@@ -700,12 +694,11 @@ Plug 'farmergreg/vim-lastplace'
 Plug 'christoomey/vim-system-copy'
 " `vim README.md:10` opens README.md at the 10th line, rather than saying "No
 " such file: README.md:10"
-Plug 'bogado/file-line'
+Plug 'xim/file-line'
 Plug 'christoomey/vim-sort-motion'
 Plug 'flazz/vim-colorschemes'
 Plug 'sjl/gundo.vim'
 Plug 'xolox/vim-misc' | Plug 'xolox/vim-easytags'
-Plug 'dense-analysis/ale'
 " Easily inspect registers exactly when you need them
 " https://github.com/junegunn/vim-peekaboo
 Plug 'junegunn/vim-peekaboo'
@@ -740,21 +733,19 @@ runtime macros/matchit.vim
 " _after_ loading plugins.
 filetype plugin indent on
 syntax enable
-set background=dark
-silent! colorscheme papercolor
+silent! colorscheme Tomorrow-Night-Bright
 
+" set background=dark
+" silent! colorscheme papercolor
 " Returns true if the color hex value is light
-function! IsHexColorLight(color) abort
-  let l:raw_color = trim(a:color, '#')
-
-  let l:red = str2nr(substitute(l:raw_color, '(.{2}).{4}', '1', 'g'), 16)
-  let l:green = str2nr(substitute(l:raw_color, '.{2}(.{2}).{2}', '1', 'g'), 16)
-  let l:blue = str2nr(substitute(l:raw_color, '.{4}(.{2})', '1', 'g'), 16)
-
-  let l:brightness = ((l:red * 299) + (l:green * 587) + (l:blue * 114)) / 1000
-
-  return l:brightness > 155
-endfunction
+" function! IsHexColorLight(color) abort
+"   let l:raw_color = trim(a:color, '#')
+"   let l:red = str2nr(substitute(l:raw_color, '(.{2}).{4}', '1', 'g'), 16)
+"   let l:green = str2nr(substitute(l:raw_color, '.{2}(.{2}).{2}', '1', 'g'), 16)
+"   let l:blue = str2nr(substitute(l:raw_color, '.{4}(.{2})', '1', 'g'), 16)
+"   let l:brightness = ((l:red * 299) + (l:green * 587) + (l:blue * 114)) / 1000
+"   return l:brightness > 155
+" endfunction
 
 function! SyntaxItem()
   " https://vim.fandom.com/wiki/Identify_the_syntax_highlighting_group_used_at_the_cursor
@@ -776,6 +767,9 @@ function! s:BetterColorschemeSettings()
   hi! Constant term=italic cterm=italic gui=italic
   hi! link gitCommitComment Comment
   hi! link gitCommitHeader Comment
+  " Ensure that Rust special comments (like doc comments) are highlighted as
+  " comments
+  hi! link rustCommentLineDoc Comment
 endfunction
 
 call <SID>BetterColorschemeSettings()

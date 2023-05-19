@@ -35,3 +35,16 @@ tool-versions
 .gitconfig.local
 
 Brewfile*.lock.json
+
+/config/karabiner/automatic_backups
+
+# Never commit node_modules in my dotfiles
+node_modules/
+package-lock.json
+package.json
+yarn.lock
+
+*.part
+*.mp4
+
+tag-private/

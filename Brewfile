@@ -17,10 +17,6 @@ brew "unused"
 # sed for HTML: https://github.com/gabebw/candle
 # brew "candle"
 
-# Includes an updated CA bundle.
-# Crucial for my Pinboard integration, even if it's not `brew link`ed in.
-brew "curl"
-
 brew "bat"
 brew "chrome-cli"
 brew "fd"
@@ -34,6 +30,7 @@ brew "ripgrep"
 brew "tag"
 brew "tree"
 brew "vim"
+brew "git-delta"
 
 # sed for json: https://robots.thoughtbot.com/jq-is-sed-for-json
 brew "jq"
@@ -58,14 +55,12 @@ brew "ffmpeg"
 # I love `sponge` so much.
 brew "moreutils"
 
-# a Postgres pager
-
 # rbenv version manager for Ruby
 brew "rbenv"
 brew "rbenv-default-gems"
 
-# Volta version manager for Node
-# brew "volta"
+# Version manager for Node
+brew "fnm"
 
 # Simple graphs with `bin/line_graph`
 brew "gnuplot"
