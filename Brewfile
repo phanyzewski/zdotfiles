@@ -37,12 +37,13 @@ brew "vim"
 
 # sed for json: https://robots.thoughtbot.com/jq-is-sed-for-json
 brew "jq"
+brew "yq"
 
 # sed for xml: http://xmlstar.sourceforge.net/doc/UG/ch04.html#idm47989546279904
-brew "xmlstarlet"
+# brew "xmlstarlet"
 
 # Slice and dice your CSV
-brew "xsv"
+# brew "xsv"
 
 # macOS ships with version 2.8. Get version 3.4+ so `diff --color` works.
 brew "diffutils"
@@ -88,7 +89,7 @@ brew "git-lfs"
 
 brew "screen"
 brew "htop"
-brew "elixir"
+# brew "elixir"
 brew "node"
 brew "imagemagick"
 brew "go"
