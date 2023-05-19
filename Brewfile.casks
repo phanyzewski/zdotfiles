@@ -4,17 +4,10 @@
 
 cask "iterm2"
 
-cask "appcleaner"
-cask "dash" # api documentation
-cask "dropbox"
 cask "google-chrome"
 cask "muzzle" # silences notifications
 cask "ngrok"
-cask "spotify"
-cask "vlc"
-cask "xee" # image viwer
 cask "zoom"
 
 cask "rectangle"
 cask "visual-studio-code"
-cask "sublime-text"
