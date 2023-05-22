@@ -8,7 +8,7 @@
 # Usage:
 #
 #     $ find-location-of myalias
-#     ~/.zshrc:530
+#     ~/.zhsrc:530
 #
 #     $ find-location-of git-merge-to
 #     ~/.bin/git-merge-to:1
@@ -17,7 +17,7 @@
 #     which is a shell builtin (printed to STDERR)
 #     exits 1
 
-source ~/.zshrc
+source ~/.zhsrc
 
 _handle_unknown_command() {
   echo "\"$1\" is not recognized as a script, function, or alias" >&2
@@ -63,7 +63,7 @@ _definition_field_for_pattern() {
 }
 
 _search_paths(){
-  echo ~/.zshrc ~/.zshenv ~/.aliases
+  echo ~/.zhsrc ~/.zshenv ~/.aliases
 }
 
 _grep_for_definition(){

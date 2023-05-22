@@ -222,7 +222,7 @@ function! MaybeTabedit(file)
 endfunction
 nnoremap <leader>ev :call MaybeTabedit($MYVIMRC)<CR>
 nnoremap <leader>sv :source $MYVIMRC<CR>
-nnoremap <leader>q :call MaybeTabedit('$HOME/.zshrc')<CR>
+nnoremap <leader>q :call MaybeTabedit('$HOME/.zhsrc')<CR>
 
 " Typo
 nnoremap :Nohl :nohlsearch

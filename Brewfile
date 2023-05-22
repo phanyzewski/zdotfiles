@@ -1,6 +1,6 @@
 # vim: syntax=ruby filetype=ruby
 
-# tap "thoughtbot/formulae"
+tap "thoughtbot/formulae"
 # rcm: dotfile management
 brew "rcm"
 # parity: useful tools for Heroku development/staging/production
@@ -34,7 +34,6 @@ brew "git-delta"
 
 # sed for json: https://robots.thoughtbot.com/jq-is-sed-for-json
 brew "jq"
-brew "yq"
 
 # sed for xml: http://xmlstar.sourceforge.net/doc/UG/ch04.html#idm47989546279904
 # brew "xmlstarlet"
@@ -48,8 +47,6 @@ brew "diffutils"
 # so :Rtags works
 brew "ctags"
 
-brew "youtube-dl"
-# youtube-dl uses ffmpeg to automatically fix some issues in downloaded files
 brew "ffmpeg"
 
 # I love `sponge` so much.
@@ -66,7 +63,7 @@ brew "fnm"
 brew "gnuplot"
 
 # Personal manpages, written in Markdown
-brew "sinclairtarget/wst/um"
+# brew "sinclairtarget/wst/um"
 
 # Rust
 brew "rustup-init"
@@ -92,3 +89,4 @@ brew "ruby"
 brew "ruby-install"
 brew "tmux"
 brew "wget"
+brew "gh"

@@ -13,7 +13,7 @@ Questions? Comments? Open an issue or tweet [@gabebw](https://twitter.com/gabebw
     $ ./install.sh
 
 It will install [rcm] and use that to safely symlink the dotfiles, prompting you
-if a file already exists (like if you already have `~/.zshrc`).
+if a file already exists (like if you already have `~/.zsh`).
 
 [rcm]: http://thoughtbot.github.io/rcm/rcm.7.html
 
@@ -31,7 +31,7 @@ so on. I'm using it for organization.
 
 ## Zsh
 
-All of the Zsh configuration is in [`zshrc`](/zshrc).
+All of the Zsh configuration is in [`zsh`](/zsh).
 
 ## Attribution
 

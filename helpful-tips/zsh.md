@@ -12,9 +12,9 @@ become two items.
 
     chsh -s /bin/zsh
 
-## Where can I find awesome 'zshrc's?
+## Where can I find awesome 'zhsrc's?
 
-<http://dotfiles.org/.zshrc> (and check out the rest of the site too)
+<http://dotfiles.org/.zhsrc> (and check out the rest of the site too)
 
 ## Search backward through history
 

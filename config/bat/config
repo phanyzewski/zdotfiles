@@ -12,4 +12,4 @@
 
 # Syntax mappings: map a certain filename pattern to a language.
 --map-syntax "vimrc:VimL"
---map-syntax "zshrc:Bourne Again Shell (bash)"
+--map-syntax "zhsrc:Bourne Again Shell (bash)"

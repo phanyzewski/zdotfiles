@@ -48,7 +48,7 @@ fi
 
 info "Installing Homebrew (if not already installed)..."
 if command_does_not_exist brew; then
-  stay_awake_while /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  stay_awake_while /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
 info "Installing Homebrew packages..."
@@ -133,7 +133,6 @@ fi
 eval "$(rbenv init -)"
 export VOLTA_HOME="$HOME/.volta"
 export PATH="$VOLTA_HOME/bin:$PATH"
-export PATH="$(go env GOPATH)/bin:$PATH"
 
 info "Running all setup scripts..."
 for setup in tag-*/setup vscode/setup; do

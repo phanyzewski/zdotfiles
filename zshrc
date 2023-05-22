@@ -50,6 +50,8 @@ alias sed="sed -E"
 # Just print request/response headers, ignoring ~/.curlrc
 curl-debug(){
   # --disable must be the first argument
+  # Do *not* add a space in `Accept-Encoding:gzip` because then it prints the
+  # entire body to the terminal instead of just `[866 bytes data]`.
   command curl \
     --disable \
     --verbose \
@@ -57,6 +59,7 @@ curl-debug(){
     --show-error \
     --output /dev/null \
     -H Fastly-debug:1 \
+    -H Accept-Encoding:gzip \
     "$@" \
     2>&1
 }
@@ -71,7 +74,7 @@ curl-with-javascript(){
 alias dup="pushd dotfiles && git checkout main &>/dev/null && git pull && git checkout - &>/dev/null && popd && qq"
 alias ...="cd ../.."
 # Copy-pasting `$ python something.py` works
-# alias \$=''
+alias \$=''
 alias diff="command diff --color=auto -u"
 alias mkdir="command mkdir -p"
 alias serialnumber="ioreg -l | rg IOPlatformSerialNumber | cut -d= -f2 | sed 's/[ \"]//g' | tee /dev/tty | pbcopy; echo '(Copied for you)'"
@@ -82,29 +85,6 @@ alias prettyjavascript="prettier --stdin-filepath=any-name-here.js"
 # Remove EXIF data
 alias exif-remove="exiftool -all= "
 alias hexdump=hexyl
-youtube-dl-safe(){
-  # Allow passing arguments in; without this, xargs treats the arguments as
-  # URLs. This block assumes all arguments are at the beginning, and stops
-  # reading when it sees something that's not an argument.
-  local args=()
-  for arg in "$@"; do
-    if [[ "$arg" =~ "^-" ]]; then
-      args+=("$arg")
-      shift
-    else
-      break
-    fi
-  done
-  print -s "youtube-dl-safe ${args:q} ${@:q}"
-  # Prefer ffmpeg because avconv gives these errors:
-  #   ERROR: av_interleaved_write_frame(): Invalid argument
-  echo "$@" | xargs -P 5 -n 1 youtube-dl --no-check-certificate --ignore-errors --no-mtime --no-overwrites --prefer-ffmpeg --add-metadata --continue $args
-}
-
-y(){
-  echo "${@:-"$(pbpaste)"}"
-  youtube-dl-safe "${@:-"$(pbpaste)"}"
-}
 
 epoch(){
   if [[ $# == 0 ]]; then
@@ -116,7 +96,7 @@ epoch(){
   fi
 }
 rcup(){
-  if ! command rcup -v | grep -v identical; then
+  if ! command rcup -fv | grep -v identical; then
     true
   fi
 }
@@ -154,24 +134,31 @@ alias cat=bat
 alias less=bat
 
 o(){
+  custom_fd(){ command fd --no-ignore --type file "$@" }
+  open_images_in_directory(){
+      # `--max-depth 1` means "only go 1 level inside the directory and don't recurse"
+      custom_fd \
+        -e jpg -e png -e jpeg \
+        --base-directory "$1" \
+        -X open -a Preview
+  }
+
   if [[ -d "$1" ]]; then
-    # Order matters (ugh):
-    # * `-print -quit` needs to be at the end
-    # * `-type` and the `-name` clauses need to be next to each other
-    if [[ -n "$(find "$1" -type f \( -name '*.mp4' -or -name '*.flv' -or -name '*.mov' \) -print -quit)" ]]; then
-      # \+ means the results are concatenated and the command is executed once
-      # with all found results.
-      find "$1" -type f \( -name '*.mp4' -or -name '*.flv' -or -name '*.mov' \) -exec open {} \+
+    if command fd -e mp4 -e flv -e mov -q --base-directory "$1"; then
+      # "-X <command>" means the results are concatenated and the command is
+      # executed once with all found results.
+      custom_fd \
+        -e mp4 -e flv -e mov \
+        --base-directory "$1" \
+        -X open
     else
-      # Unfortunately, Xee doesn't set kMDItemLastUsedDate on files when you
-      # open their containing directory.
-      xee "$@"
+      open_images_in_directory "$1"
     fi
   else
     if [[ $# == 0 ]]; then
       # Are there any images in this directory?
       if [[ -n *.{png,jpg}(#qN) ]]; then
-        xee .
+        open_images_in_directory .
       else
         open *.*
       fi
@@ -238,7 +225,7 @@ opened(){
 # `mdfind`.
 search_spotlight_files(){
   # `-onlyin .` will recurse
-  mdfind -onlyin . "$1" | sort | rg -v '\.(part|ytdl|download|epub)$'
+  mdfind -onlyin . "$1" | sort | rg -v '\.(part|download|epub)$'
 }
 # }}}
 
@@ -249,7 +236,7 @@ SAVEHIST=$HISTSIZE
 unsetopt list_beep
 unsetopt beep
 # Append as you type (incrementally) instead of on shell exit
-setopt append_history
+setopt inc_append_history
 setopt hist_ignore_all_dups
 setopt hist_reduce_blanks
 setopt autocd
@@ -300,9 +287,10 @@ export FZF_DEFAULT_OPTS='--color fg:188,bg:233,hl:103,fg+:222,bg+:234,hl+:104
 fpath=(
   ~/.zsh/completion-scripts
   /usr/local/share/zsh/site-functions
+  /usr/local/opt/heroku/libexec/node_modules/@heroku-cli/plugin-autocomplete/autocomplete/zsh
   $fpath
 )
-autoload -Uz compinit && compinit
+autoload -Uz compinit
 # completion: use cache if updated within 24h
 if [[ -n $HOME/.zcompdump(#qN.mh+24) ]]; then
   compinit -d $HOME/.zcompdump
@@ -344,14 +332,13 @@ zstyle ':completion:*:ls:*:*' list-colors 'di=34:ln=35:so=32:pi=33:ex=31:bd=34;4
 # Complete the command on the left like the command on the right
 compdef '_files -/' tcd
 compdef viw=which
-compdef find-location-of=which
-# compdef staging=heroku
-# compdef production=heroku
+compdef staging=heroku
+compdef production=heroku
 
-# if [ -f /usr/local/etc/bash_completion.d/um-completion.sh ]; then
-#   autoload -Uz bashcompinit && bashcompinit
-#   . /usr/local/etc/bash_completion.d/um-completion.sh
-# fi
+if [ -f /usr/local/etc/bash_completion.d/um-completion.sh ]; then
+  autoload -Uz bashcompinit && bashcompinit
+  . /usr/local/etc/bash_completion.d/um-completion.sh
+fi
 
 # Show dots when autocompleting, so that I know it's doing something when
 # autocompletion takes a long time.
@@ -365,50 +352,11 @@ zle -N expand-or-complete-with-dots
 bindkey "^I" expand-or-complete-with-dots
 # }}}
 
-# $PATH {{{
-
-# Add Homebrew to the path.
-PATH=/usr/local/bin:/usr/local/sbin:$PATH
-
-# Heroku standalone client
-# PATH="/usr/local/heroku/bin:$PATH"
-
-# Node
-PATH=$PATH:.git/safe/../../node_modules/.bin/
-
-# Python
-# Homebrew stores unversioned symlinks (e.g. `python` for `python3`) here, so
-# add them to the front so we always get Python 3.
-PATH=/usr/local/opt/python/libexec/bin:$PATH
-PATH=/usr/local/Cellar/python/3.7.2_2/Frameworks/Python.framework/Versions/3.7/bin:$PATH
-
-# Postgres.app
-# PATH=$PATH:/Applications/Postgres.app/Contents/Versions/latest/bin
-
-PATH=$HOME/.bin:$PATH
-PATH=./bin/stubs:$PATH
-PATH="$(go env GOPATH)/bin":$PATH
-
-# Rust
-[[ -r "$HOME"/.cargo/env ]] && source "$HOME"/.cargo/env
-alias ci="cargo install --path . --force"
-
-# rbenv
-eval "$(rbenv init -)"
-
-# Volta
-# }}}
-
 # Key bindings {{{
 # Vim-style line editing
 # This sets up a bunch of bindings, so call this first and then call all
 # other `bindkey`s after it to override anything you like.
 bindkey -v
-
-# Ctrl-V to open current command in Vim
-autoload -z edit-command-line
-zle -N edit-command-line
-bindkey "^v" edit-command-line
 
 # Fuzzy match against history, edit selected value
 # For exact match, start the query with a single quote: 'curl
@@ -470,30 +418,25 @@ add_subdirs_to_cdpath "$HOME/code/work"
 export PROJECT_DIRECTORIES=$CDPATH
 # }}}
 
-# Prompt {{{
-eval "$(starship init zsh)"
-# }}}
-
 # Git {{{
 
 # By itself: run `git status`
 # With arguments: acts like `git`
-# function g {
-#   if [[ $# > 0 ]]; then
-#     git "$@"
-#   else
-#     git st
-#   fi
-# }
+function g {
+  if [[ $# > 0 ]]; then
+    git "$@"
+  else
+    git st
+  fi
+}
 
-alias g=git
-# alias gd="git diff"
-# alias gdm="git master-to-main-wrapper diff origin/%BRANCH%"
-# alias amend="git commit --amend -Chead"
-# alias amend-new="git commit --amend"
+alias gd="git diff"
+alias gdm="git master-to-main-wrapper diff origin/%BRANCH%"
+alias amend="git commit --amend -Chead"
+alias amend-new="git commit --amend"
 
-# alias ga="git add"
-# alias gcp="git rev-parse HEAD | xargs echo -n | pbcopy"
+alias ga="git add"
+alias gcp="git rev-parse HEAD | xargs echo -n | pbcopy"
 gcr(){
   local branch=$(select-git-branch --all)
   if [[ -n "$branch" ]]; then
@@ -521,9 +464,11 @@ gcm(){
   if [[ "$#" == 0 ]]; then
     git master-to-main-wrapper checkout %BRANCH%
   else
-    if [[ "$branch" =~ '^EXT-' ]]; then
-      # Grab JIRA ticket name and prefix it to the commit
-      ticket_number=$(echo "$branch" | sed -E 's/^(EXT-[0-9]+).*/\1/g')
+    # Grab JIRA ticket name (if any) and prefix it to the commit.
+    if [[ "$branch" =~ '^([A-Z]{2,}-[0-9]+)' ]]; then
+      # The magic "$match" array variable now contains the groups we matched
+      # (1-indexed).
+      ticket_number=$match[1]
       commit_message="$ticket_number $commit_message"
     fi
     local commit_message_length=$(echo -n "$commit_message" | wc -c | xargs echo -n)
@@ -577,68 +522,68 @@ split-on-spaces(){ tr ' ' '\n' }
 # Sum numbers (1 per line) from STDIN
 sum(){ join-with "+" | bc }
 
-# function gcl {
-#   # if you do `local directory=$(superclone "$@")`, it will not pick up the
-#   # `superclone` return code and $? will always be 0 because it successfully
-#   # assigned the variable. The solution is to separate `local` onto its own
-#   # line.
-#   local directory
-#   directory=$(superclone "$@")
-#   if [[ $? -eq 0 ]]; then
-#     cd "$directory"
-#   else
-#     return 1
-#   fi
-# }
+function gcl {
+  # if you do `local directory=$(superclone "$@")`, it will not pick up the
+  # `superclone` return code and $? will always be 0 because it successfully
+  # assigned the variable. The solution is to separate `local` onto its own
+  # line.
+  local directory
+  directory=$(superclone "$@")
+  if [[ $? -eq 0 ]]; then
+    cd "$directory"
+  else
+    return 1
+  fi
+}
 
-# new-project(){
-#   if [[ $# == 0 ]]; then
-#     printf "Project name? "
-#     read project_name
-#   else
-#     project_name=$1
-#   fi
-#   local project_name=${project_name// /-}
-#   pushd personal >/dev/null
-#   if [[ -d "$project_name" ]]; then
-#     echo "!! Project directory with that name already exists" >&2
-#     return 1
-#   fi
-#   if [[ -f "$project_name" ]]; then
-#     echo "!! Project FILE with that name already exists" >&2
-#     return 1
-#   fi
-#   mkdir "$project_name" && tcd "./$project_name"
-#   popd >/dev/null
-# }
+new-project(){
+  if [[ $# == 0 ]]; then
+    printf "Project name? "
+    read project_name
+  else
+    project_name=$1
+  fi
+  local project_name=${project_name// /-}
+  pushd personal >/dev/null
+  if [[ -d "$project_name" ]]; then
+    echo "!! Project directory with that name already exists" >&2
+    return 1
+  fi
+  if [[ -f "$project_name" ]]; then
+    echo "!! Project FILE with that name already exists" >&2
+    return 1
+  fi
+  mkdir "$project_name" && tcd "./$project_name"
+  popd >/dev/null
+}
 
 # Clone and start a new tmux session about it
-# clone(){
-#   if [[ $# < 2 ]]; then
-#     echo "Please provide a directory and a repo name" >&2
-#     echo "Usage: clone personal gabebw/dotfiles [gabebw-dotfiles]" >&2
-#     return 1
-#   fi
-#   local directory=$1
-#   local session_name
-#   pushd "$directory" >/dev/null
-#   shift
-#   if gcl "$@"; then
-#     # Name the session after the current directory
-#     session_name=$(basename "$PWD")
-#     if tmux-session-exists "$session_name"; then
-#       session_name="${session_name}-new"
-#     fi
-#     tcd "$PWD" "$session_name"
-#     popd >/dev/null
-#   fi
-#   popd >/dev/null
-# }
+clone(){
+  if [[ $# < 2 ]]; then
+    echo "Please provide a directory and a repo name" >&2
+    echo "Usage: clone personal gabebw/dotfiles [gabebw-dotfiles]" >&2
+    return 1
+  fi
+  local directory=$1
+  local session_name
+  pushd "$directory" >/dev/null
+  shift
+  if gcl "$@"; then
+    # Name the session after the current directory
+    session_name=$(basename "$PWD")
+    if tmux-session-exists "$session_name"; then
+      session_name="${session_name}-new"
+    fi
+    tcd "$PWD" "$session_name"
+    popd >/dev/null
+  fi
+  popd >/dev/null
+}
 
 # Complete `g` like `git`, etc
 compdef g=git
-# compdef _git gc=git-branch
-# compdef _git ga=git-add
+compdef _git gc=git-branch
+compdef _git ga=git-add
 # }}}
 
 # Editor {{{
@@ -649,6 +594,10 @@ export EDITOR=$VISUAL
 alias vi="$VISUAL"
 alias ev="vim '$(readlink ~/.vimrc)'"
 v(){
+  if [[ "$PWD" == "$HOME" ]]; then
+    echo "Refusing to run this in your home directory" >&2
+    return 1
+  fi
   local old_IFS=$IFS
   IFS=$'\n'
   local files=($(fzf-tmux --query="$1" --multi --exit-0))
@@ -672,13 +621,13 @@ alias crontab="VISUAL=vim crontab"
 
 # Ruby/Rails {{{
 
-# alias h=heroku
-# alias migrate="be rake db:migrate db:test:prepare"
-# alias rollback="be rake db:rollback"
-# alias remigrate="migrate && rake db:rollback && migrate"
-# alias rrg="be rake routes | rg"
-# alias db-reset="be rake db:drop db:create db:migrate db:test:prepare"
-# alias unfuck-gemfile="git checkout HEAD -- Gemfile.lock"
+alias h=heroku
+alias migrate="be rake db:migrate db:test:prepare"
+alias rollback="be rake db:rollback"
+alias remigrate="migrate && rake db:rollback && migrate"
+alias rrg="rails routes | rg"
+alias db-reset="be rake db:drop db:create db:migrate db:test:prepare"
+alias unfuck-gemfile="git checkout HEAD -- Gemfile.lock"
 
 # Bundler
 alias be="bundle exec"
@@ -688,7 +637,7 @@ alias tagit='/usr/local/bin/ctags -R'
 b(){
   if [[ $# == 0 ]]; then
     (bundle check > /dev/null || bundle install --jobs=4) && \
-      bundle --quiet --binstubs=./bin/stubs
+      bundle binstubs --all --path=./bin/stubs
   else
     bundle "$@"
   fi
@@ -696,61 +645,39 @@ b(){
 
 # }}}
 
-# JavaScript {{{
-cra(){
-  local projectname=$1
-  local do_prompt
-  if yarn create react-app --template typescript "$@"; then
-    pushd "$projectname"
-    # Save old value
-    [[ -e "$(setopt | rg rmstar)" ]] && do_prompt=true || do_prompt=false
-    # Turn off Zsh prompt:
-    # zsh: sure you want to delete all 8 files in DIR [yn]?
-    setopt rm_star_silent
-    rm -f src/*
-    touch src/index.tsx
-    # Turn the prompt back on, if it was disabled
-    $do_prompt && unsetopt rm_star_silent
-    git commit -am 'Remove autogenerated code'
-    popd
-    tcd "$projectname"
-  fi
-}
-# }}}
-
 # Postgres {{{
 # Set filetype on editing. Use `\e` to open the editor from `psql`.
-# export PSQL_EDITOR="vim -c ':set ft=sql'"
+export PSQL_EDITOR="vim -c ':set ft=sql'"
 
-# # db-dump DB_NAME FILENAME
-# function db-dump() {
-#   if (( $# == 2 )); then
-#     pg_dump --clean --create --format=custom --file "$2" "$1" && \
-#       echo "Wrote to $2"
-#   else
-#     echo "Usage: db-dump DB_NAME FILENAME"
-#     return 1
-#   fi
-# }
+# db-dump DB_NAME FILENAME
+function db-dump() {
+  if (( $# == 2 )); then
+    pg_dump --clean --create --format=custom --file "$2" "$1" && \
+      echo "Wrote to $2"
+  else
+    echo "Usage: db-dump DB_NAME FILENAME"
+    return 1
+  fi
+}
 
 # db-restore DB_NAME FILENAME
-# function db-restore() {
-#   if (( $# == 2 )); then
-#     dropdb "$1" && \
-#       createdb "$1" && \
-#       pg_restore \
-#         --verbose \
-#         --clean \
-#         --no-acl \
-#         --no-owner \
-#         --jobs $(getconf _NPROCESSORS_ONLN) \
-#         --dbname "$1" \
-#         "$2"
-#   else
-#     echo "Usage: db-restore DB_NAME FILENAME"
-#     return 1
-#   fi
-# }
+function db-restore() {
+  if (( $# == 2 )); then
+    dropdb "$1" && \
+      createdb "$1" && \
+      pg_restore \
+        --verbose \
+        --clean \
+        --no-acl \
+        --no-owner \
+        --jobs $(getconf _NPROCESSORS_ONLN) \
+        --dbname "$1" \
+        "$2"
+  else
+    echo "Usage: db-restore DB_NAME FILENAME"
+    return 1
+  fi
+}
 # }}}
 
 # Homebrew {{{
@@ -767,49 +694,48 @@ export HOMEBREW_INSTALL_CLEANUP=1
 # }}}
 
 # custom TIL script, with completion {{{
-# TIL_DIRECTORY="/Users/gabe/code/personal/today-i-learned/"
-# _complete-first-file-argument() {
-#   if (( CURRENT == 2 )); then
-#     # Only complete first argument
-#     _files -W "$TIL_DIRECTORY"
-#   fi
-# }
-# til(){
-#   if [[ $# == 0 ]]; then
-#     echo "Usage: til how to do something"
-#     return 0;
-#   fi
-#   local filename=$*
-#   filename=${filename// /-}
-#   mkdir -p "$(basename "${TIL_DIRECTORY}/${filename}")"
-#   echo "# $*\n" > "${TIL_DIRECTORY}/${filename}.md"
-#   vim "${TIL_DIRECTORY}/${filename}.md"
-#   echo "Don't forget to commit your file!"
-# }
-# compdef _complete-first-file-argument til
+TIL_DIRECTORY="/Users/hanyzewski/code/personal/today-i-learned/"
+_complete-first-file-argument() {
+  if (( CURRENT == 2 )); then
+    # Only complete first argument
+    _files -W "$TIL_DIRECTORY"
+  fi
+}
+til(){
+  if [[ $# == 0 ]]; then
+    echo "Usage: til how to do something"
+    return 0;
+  fi
+  local filename=$*
+  filename=${filename// /-}
+  mkdir -p "$(basename "${TIL_DIRECTORY}/${filename}")"
+  echo "# $*\n" > "${TIL_DIRECTORY}/${filename}.md"
+  vim "${TIL_DIRECTORY}/${filename}.md"
+  echo "Don't forget to commit your file!"
+}
+compdef _complete-first-file-argument til
 # }}}
 
 # Set up SSH helper (mostly for Git)
 ssh-add -K ~/.ssh/id_rsa 2> /dev/null
-ssh-add -K ~/.ssh/gh_id_ed25519 2> /dev/null
 
 # zsh-syntax-highlighting must be sourced after all custom widgets have been
 # created (i.e., after all zle -N calls and after running compinit), because it
 # has to know about them to highlight them.
 # More on ZSH_HIGHLIGHT_HIGHLIGHTERS:
-# export ZSH_HIGHLIGHT_HIGHLIGHTERS_DIR=/opt/homebrew/share/zsh-syntax-highlighting/highlighters
-
 # https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/docs/highlighters.md
-if [[  -z "$ZSH_HIGHLIGHT_HIGHLIGHTERS" ]]; then
-  # Only source Zsh Syntax Highlighting once, otherwise we can run into
-  # a "maximum nested function level reached" error
-  ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets)
-  # source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-fi
+# if [[ -z "$ZSH_HIGHLIGHT_HIGHLIGHTERS" ]]; then
+#   # Only source Zsh Syntax Highlighting once, otherwise we can run into
+#   # a "maximum nested function level reached" error
+#   ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets)
+#   source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# fi
 
-[[ -r ~/.aliases ]] && source ~/.aliases
-export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME/bin:$PATH"
+# Run in dotfiles repo
+sort-vscode-settings() {
+  local f="./Library/Application Support/Code/User/settings.json"
+  jq --sort-keys < "$f" | sponge "$f"
+}
 
 # SSH to a specific Google Cloud Instance
 gssh () {
@@ -822,8 +748,6 @@ tssh () {
   compute_instance_zone="$(echo -n $compute_instance_info | awk '{print $2}')"
   gcloud compute ssh --internal-ip --zone "$compute_instance_zone" "$compute_instance_name"
 }
-export PATH="/opt/homebrew/opt/mysql-client/bin:$PATH"
-
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/Users/phanyzewski/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/phanyzewski/google-cloud-sdk/path.zsh.inc'; fi
 
@@ -863,5 +787,61 @@ imup () {
   gcloud container clusters list && \
   gcloud container clusters get-credentials imup -z us-central1-a
 }
+
+# $PATH {{{
+# $PATH stuff is last so that other things don't add their own $PATH stuff
+# before it.
+
+# This prevents duplicate entries in $PATH (e.g. after re-sourcing this files).
+typeset -U path
+
+# Add Homebrew to the path.
+PATH=/usr/local/bin:/usr/local/sbin:/opt/homebrew/bin:$PATH
+
+# Heroku standalone client
+PATH="/usr/local/heroku/bin:$PATH"
+
+# Node
+PATH=$PATH:.git/safe/../../node_modules/.bin/
+
+# Python
+# Homebrew stores unversioned symlinks (e.g. `python` for `python3`) here, so
+# add them to the front so we always get Python 3.
+PATH=/usr/local/opt/python/libexec/bin:$PATH
+PATH=/usr/local/Cellar/python/3.7.2_2/Frameworks/Python.framework/Versions/3.7/bin:$PATH
+
+# Postgres.app takes precedence
+PATH=/Applications/Postgres.app/Contents/Versions/latest/bin:$PATH
+
+# gcloud
 export CLOUDSDK_PYTHON="/opt/homebrew/bin/python3.8"
-export PATH="/opt/homebrew/opt/mongodb-community@4.4/bin:$PATH"
+PATH=/opt/homebrew/opt/mongodb-community@4.4/bin:$PATH
+
+# mongo
+PATH=/opt/homebrew/opt/mongodb-community@4.4/bin:$PATH
+
+# mysql client
+PATH=/opt/homebrew/opt/mysql-client/bin:$PATH
+
+# osnp
+PATH=$HOME/.bin:$PATH
+
+# Rust
+[[ -r "$HOME"/.cargo/env ]] && source "$HOME"/.cargo/env
+alias ci="cargo install --path . --force"
+
+# Node
+eval "$(fnm env --use-on-cd --log-level=error)"
+# }}}
+
+# Prompt {{{
+eval "$(starship init zsh)"
+# }}}
+
+# rbenv
+eval "$(rbenv init - zsh)"
+
+# Add binstubs *after* doing rbenv
+PATH=./bin/stubs:$PATH
+
+[[ -r ~/.aliases ]] && source ~/.aliases

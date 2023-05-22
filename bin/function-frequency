@@ -1,10 +1,10 @@
 #!/bin/zsh
 
-# Print out how many times each function defined in ~/.zshrc and ~/.zshenv has
+# Print out how many times each function defined in ~/.zhsrc and ~/.zshenv has
 # ever been called.
 #
 
-for name in $(rg --trim -I '[a-z_-]+\(\)|function [a-z_-]+' ~/.zshrc ~/.zshenv | \
+for name in $(rg --trim -I '[a-z_-]+\(\)|function [a-z_-]+' ~/.zhsrc ~/.zshenv | \
     rg -v '\s*#' | \
     sed -E -e 's/([a-z_-]+)\(\).+/\1/' -e 's/.*function ([a-z_-]+).*/\1/'); do
 
